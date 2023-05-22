@@ -45,6 +45,18 @@ namespace PokemonApp.Controllers
             return Ok(category);
 
         }
+
+        [HttpGet("pokemon/{categoryId}")]
+        [ProducesResponseType(200, Type = typeof(ICollection<Pokemon>))]
+        [ProducesResponseType(400)]
+        public IActionResult GetPokemonByCateogory(int cateogoryID)
+        {
+            var pokemons = _mapper.Map<List<PokemonDto>>
+                (_categoryRepository.GetPokemonByCategory(cateogoryID));
+            if (!ModelState.IsValid)
+                BadRequest(ModelState);
+            return Ok(pokemons);
+        }
     }
 
 }
