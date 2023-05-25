@@ -63,7 +63,7 @@ namespace PokemonApp.Controllers
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreatCountry([FromBody] CountryDto countryCreate)
+        public IActionResult CreateCountry([FromBody] CountryDto countryCreate)
         {
             if(countryCreate == null)
             {
@@ -87,6 +87,29 @@ namespace PokemonApp.Controllers
                 StatusCode(500, ModelState);
             }
             return Ok("Successfully created.");
+        }
+
+        [HttpPut("{countryID}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateCountry(int countryID, [FromBody] CountryDto updateCountry)
+        {
+            if (updateCountry == null)
+                return BadRequest(ModelState);
+            if (countryID != updateCountry.Id)
+                return BadRequest(ModelState);
+            if (!_countryRepository.CountryExists(countryID))
+                return NotFound();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var countryMap = _mapper.Map<Country>(updateCountry);
+            if (!_countryRepository.UpdateCountry(countryMap))
+            {
+                ModelState.AddModelError("", "Could not be updated.");
+                StatusCode(500, ModelState);
+            }
+            return NoContent();
         }
     }
 }

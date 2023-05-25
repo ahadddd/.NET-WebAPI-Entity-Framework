@@ -84,8 +84,35 @@ namespace PokemonApp.Controllers
                 return StatusCode(500, ModelState); 
             }
             return Ok("Successfully added.");
-                
 
+        }
+
+
+        [HttpPut("{categoryID}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateCategory(int categoryID, [FromBody] CategoryDto categoryUpdate)
+        {
+            if (categoryUpdate == null)
+            {
+                ModelState.AddModelError("", "Something wrong happened.");
+                BadRequest(ModelState);
+            }
+
+            if (categoryID != categoryUpdate.Id)
+                return BadRequest();
+            if (!_categoryRepository.CategoryExists(categoryID))
+                return NotFound();
+            if (!ModelState.IsValid)
+                return BadRequest();
+            var categoryMap = _mapper.Map<Category>(categoryUpdate);
+            if (!_categoryRepository.UpdateCategory(categoryMap))
+            {
+                ModelState.AddModelError("", "Could not be updated.");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent(); 
         }
     }
 
