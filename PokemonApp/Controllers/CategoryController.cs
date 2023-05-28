@@ -114,6 +114,28 @@ namespace PokemonApp.Controllers
             }
             return NoContent(); 
         }
+
+        [HttpDelete("{categoryID}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteCategory(int categoryID)
+        {
+            //if (categoryID == null)
+            //    return BadRequest(ModelState);
+            if (!_categoryRepository.CategoryExists(categoryID))
+                return NotFound();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var category = _mapper.Map<Category>(_categoryRepository.GetCategory(categoryID));
+            if (!_categoryRepository.DeleteCategory(category))
+            {
+                ModelState.AddModelError("", "Category could not be deleted.");
+                StatusCode(500, ModelState);
+            }
+            return Ok("Category deleted.");
+        }
+
     }
 
 }

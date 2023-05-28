@@ -24,7 +24,7 @@ namespace PokemonApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetReviews()
         {
-           var reviews =  _mapper.Map<List<ReviewDto>>(_reviewRepository.GetReviews());
+            var reviews = _mapper.Map<List<ReviewDto>>(_reviewRepository.GetReviews());
 
             if (!ModelState.IsValid)
                 BadRequest(ModelState);
@@ -49,11 +49,35 @@ namespace PokemonApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetReviewsOfPokemon(int pokeID)
         {
-            var reviews = _mapper.Map<List<Review>>(_reviewRepository.GetReviewsOfPokemon(pokeID));
+            var reviews = _mapper.Map<List<ReviewDto>>(_reviewRepository.GetReviewsOfPokemon(pokeID));
             if (!ModelState.IsValid)
                 BadRequest(ModelState);
             return Ok(reviews);
 
         }
+
+        [HttpPut("{reviewId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateReview(int reviewId, [FromBody] ReviewDto updateReview)
+        {
+            if (updateReview == null)
+                return BadRequest(ModelState);
+            if (reviewId != updateReview.Id)
+                return BadRequest(ModelState);
+            if (!_reviewRepository.ReviewExists(reviewId))
+                return NotFound();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var reviewMap = _mapper.Map<Review>(updateReview);
+            if (!_reviewRepository.UpdateReview(reviewMap))
+            {
+                StatusCode(500, ModelState);
+                ModelState.AddModelError("", "Review could not be updated.");
+            }
+            return Ok("Review has been updated");
+        }
+
     }
 }
