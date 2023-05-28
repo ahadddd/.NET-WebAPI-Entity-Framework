@@ -1,4 +1,5 @@
-﻿using PokemonApp.Models;
+﻿using Microsoft.CodeAnalysis;
+using PokemonApp.Models;
 
 namespace PokemonApp.Interfaces
 {
@@ -17,6 +18,8 @@ namespace PokemonApp.Interfaces
         bool CreateCountry(Country country);
 
         bool UpdateCountry(Country country);
+
+        bool DeleteCountry(Country country);
 
         bool Save();
     }

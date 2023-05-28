@@ -111,6 +111,25 @@ namespace PokemonApp.Controllers
             }
             return NoContent();
         }
+
+        [HttpDelete("{countryId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteCountry(int countryId)
+        {
+            if (!_countryRepository.CountryExists(countryId))
+                return NotFound();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var countryMap = _mapper.Map<Country>(_countryRepository.GetCountry(countryId));
+            if (!_countryRepository.DeleteCountry(countryMap))
+            {
+                ModelState.AddModelError("", "Not Deleted.");
+                return StatusCode(500, ModelState);
+            }
+            return Ok("Country deleted.");
+        }
     }
 }
 
